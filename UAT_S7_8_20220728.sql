@@ -1,11 +1,9 @@
 
-----S7/8
-
 with UAT_table AS (
 SELECT 
   *
 FROM SANDBOX_DB.USER_TB.CLIP_UAT_RESULTS_DATA
-WHERE TEST_ID = 'fb61d0e5-865c-41fd-8d89-ba320a60b2c2'
+WHERE TEST_ID = '960147e7-f606-499c-a1c8-035cb7464466'
     and statement_number in (7,8)
     and clip_policy_name not ilike '%double%your%line%'
   
@@ -51,7 +49,7 @@ SELECT
   as pass_eligibility
   ,decision_data:"transunion__account_review__fico_08__FICO_08"
   ,CASE 
-  WHEN left(decision_data:"transunion__account_review__fico_08__FICO_08",1) = '+' 
+  WHEN left(decision_data:"transunion__account_review__fico_08__FICO_08",1) = '+' or decision_data:"transunion__account_review__fico_08__FICO_08" like '%null%'
   then 0 
   else decision_data:"transunion__account_review__fico_08__FICO_08"
   end AS FICO_CLEAN
@@ -91,13 +89,18 @@ SELECT
   ,decision_data:"average_utilization_3_months"::FLOAT AS average_utilization_3_months_FLOAT
   ,decision_data:"average_purchase_utilization_3_months"::FLOAT AS average_purchase_utilization_3_months
   ,decision_data:"ab_testing_random_number"::FLOAT AS ab_testing_random_number_FLOAT
+  ,decision_data:"policy_assignment_random_number"::FLOAT AS policy_assignment_random_number_FLOAT
   ,decision_data:"payment_vacation__passed" AS payment_vacation__passed
+  ,decision_data:"statement_3_outcome" AS statement_3_outcome_TEXT
+  ,decision_data:"statement_3_test_group" AS statement_3_test_group_TEXT
   ,OUTCOME
   ,TEST_SEGMENT
   ,decision_data:"delinquencies"::INT AS delinquencies_count
   ,decision_data:"min_clip"::BOOLEAN as min_CLIP_flag
    , CASE 
   when pass_eligibility = 0 then 0
+  WHEN statement_3_outcome_TEXT ilike '%approved%' and statement_3_test_group_TEXT ilike '%rollout%' and policy_assignment_random_number_FLOAT < 0.33 THEN 0
+  WHEN statement_3_outcome_TEXT ilike '%approved%' and statement_3_test_group_TEXT ilike '%test1%' and policy_assignment_random_number_FLOAT < 0.5 THEN 0
   WHEN (pass_eligibility= 1 and account_review_hardcuts = 0) OR payment_vacation__passed = 'false' THEN 100
 --transactor CLIP
 WHEN  average_utilization_3_months_FLOAT <0.1 AND  average_purchase_utilization_3_months <0.1 THEN 100
@@ -284,6 +287,9 @@ SELECT  A.ACCOUNT_ID,
             WHEN AVERAGE_UTILIZATION_3_MONTHS_FLOAT < 0.8 THEN 'UTIL5'
             ELSE 'UTIL6' END AS UTIL_BAND,
         AB_TESTING_RANDOM_NUMBER_FLOAT,
+        POLICY_ASSIGNMENT_RANDOM_NUMBER_FLOAT,
+        statement_3_outcome_TEXT,
+        statement_3_test_group_TEXT,
         OUTCOME,
         TEST_SEGMENT,
         pass_eligibility,
@@ -307,8 +313,11 @@ SELECT  A.ACCOUNT_ID,
         average_purchase_utilization_3_months,
         UTIL_BAND,
         min_CLIP_flag,
+        statement_3_outcome_TEXT,
+        statement_3_test_group_TEXT,
         OUTCOME,
         AB_TESTING_RANDOM_NUMBER_FLOAT,
+        POLICY_ASSIGNMENT_RANDOM_NUMBER_FLOAT,
         TEST_SEGMENT,
         pass_eligibility,
         account_review_hardcuts,
@@ -326,8 +335,10 @@ SELECT  A.ACCOUNT_ID,
             AS MAX_ATP_CLIP_AMOUNT,
         CASE 
             WHEN CLIP_AMOUNT_FIRST <= MAX_ATP_CLIP_AMOUNT THEN CLIP_AMOUNT_FIRST
+            WHEN statement_3_outcome_TEXT ilike '%approved%' and statement_3_test_group_TEXT ilike '%rollout%' and policy_assignment_random_number_FLOAT < 0.33 THEN 0
+            WHEN statement_3_outcome_TEXT ilike '%approved%' and statement_3_test_group_TEXT ilike '%test1%' and policy_assignment_random_number_FLOAT < 0.5 THEN 0
             WHEN min_CLIP_Flag ilike '%true%' then 100
-  
+            
             WHEN  average_utilization_3_months_FLOAT <0.1 AND  average_purchase_utilization_3_months <0.1 THEN 100
             WHEN  average_utilization_3_months_FLOAT <0.1 AND  average_purchase_utilization_3_months >=0.1 AND  ab_testing_random_number_FLOAT < 0.05 THEN 100
             WHEN   clip_risk_group_INT = 1 AND  average_utilization_3_months_FLOAT <0.1 AND  average_purchase_utilization_3_months >=0.1 AND  ab_testing_random_number_FLOAT >= 0.05 THEN 500
