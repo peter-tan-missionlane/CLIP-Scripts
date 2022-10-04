@@ -4,11 +4,17 @@ set max_y1_line = 5000
 with UAT_table AS (
 SELECT 
   a.*
-    , EVALUATED_TIMESTAMP as EVALUATED_TIMESTAMP_UTC
-FROM EDW_DB.PUBLIC.CLIP_RESULTS_DATA a
+//    , EVALUATED_TIMESTAMP as EVALUATED_TIMESTAMP_UTC // use for CLIP_RESULTS_DATA
+//FROM EDW_DB.PUBLIC.CLIP_UAT_RESULTS_DATA a
+FROM SANDBOX_DB.USER_TB.CLIP_UAT_RESULTS_DATA a
 WHERE 
-    statement_number in (7,8)
-    and to_date(EVALUATED_TIMESTAMP) > '2022-09-16'   
+////  use for CLIP_RESULTS_DATA ////      
+//    statement_number in (7,8)
+//    and to_date(EVALUATED_TIMESTAMP) > '2022-09-16'  
+  
+////  use for CLIP_UAT_RESULTS_DATA ////
+    test_id = '52bc0167-4971-4660-89cb-7e2c61f78232'  //select your test ID 
+    and statement_number = 7
 )
 
 ,clip_simulation_table AS (
@@ -123,7 +129,8 @@ SELECT
   ELSE 0
   END
   AS account_review_hardcuts
-  ,decision_data:"clip_model_c_20210811_risk_group"::INT AS clip_risk_group_INT
+  ,decision_data:"clip_model_c_20210811_risk_group"::INT AS clip_risk_group_c_INT
+  ,decision_data:"clip_model_d1_20220728_risk_group":INT AS clip_risk_group_d_INT
   ,decision_data:"average_utilization_3_months"::FLOAT AS average_utilization_3_months_FLOAT
   ,decision_data:"average_purchase_utilization_3_months"::FLOAT AS average_purchase_utilization_3_months
   ,decision_data:"ab_testing_random_number"::FLOAT AS ab_testing_random_number_FLOAT
@@ -199,7 +206,8 @@ SELECT  A.ACCOUNT_ID,
         A.CLIP_POLICY_NAME,
         STATEMENT_NUMBER,
         decision_data,
-        CLIP_RISK_GROUP_INT,
+        CLIP_RISK_GROUP_c_INT,
+        CLIP_RISK_GROUP_d_INT,
              RISKGROUP_DSERIES_Y1,
               A.vantage_30_float,
               A.total_revolving_debt_to_income_float,
@@ -238,7 +246,7 @@ SELECT  A.ACCOUNT_ID,
        // A.CLIP_POLICY_NAME,
         STATEMENT_NUMBER,
 --        decision_data,
-        CLIP_RISK_GROUP_INT as RISKGROUP_CSERIES_Y1,
+        CLIP_RISK_GROUP_c_INT as RISKGROUP_CSERIES_Y1,
                RISKGROUP_DSERIES_Y1,
                A.vantage_30_float,
                A.total_revolving_debt_to_income_float,
@@ -272,11 +280,20 @@ SELECT  A.ACCOUNT_ID,
     
         CASE 
            when pass_eligibility = 0 then 0 
-    when pass_eligibility = 1 and account_review_hardcuts = 0 then 100
-            WHEN MAX_ATP_CLIP_AMOUNT = 0 THEN 0 
+           when pass_eligibility = 1 and account_review_hardcuts = 0 then 100
+           WHEN MAX_ATP_CLIP_AMOUNT = 0 THEN 0 
 
+           --incr transactor CLIP
+           WHEN PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 2000 AND RISKGROUP_DSERIES_Y1 = 5 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND average_purchase_utilization_3_months >= 0.1 AND ab_testing_random_number_FLOAT >= 0.02 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
+           WHEN PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 2000 AND RISKGROUP_DSERIES_Y1 = 6 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND average_purchase_utilization_3_months >= 0.1 AND ab_testing_random_number_FLOAT >= 0.02 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
+           WHEN PRE_CLIP_LINE_LIMIT > 2000 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DSERIES_Y1 = 3 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND average_purchase_utilization_3_months >= 0.1 AND ab_testing_random_number_FLOAT >= 0.02 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
+           WHEN PRE_CLIP_LINE_LIMIT > 2000 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DSERIES_Y1 = 4 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND average_purchase_utilization_3_months >= 0.1 AND ab_testing_random_number_FLOAT >= 0.02 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
+           WHEN PRE_CLIP_LINE_LIMIT > 2000 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DSERIES_Y1 = 5 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND average_purchase_utilization_3_months >= 0.1 AND ab_testing_random_number_FLOAT >= 0.02 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
+           WHEN PRE_CLIP_LINE_LIMIT > 2000 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DSERIES_Y1 = 6 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND average_purchase_utilization_3_months >= 0.1 AND ab_testing_random_number_FLOAT >= 0.02 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
   
- WHEN PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 1000 AND RISKGROUP_DSERIES_Y1 = 1 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 AND (PRE_CLIP_LINE_LIMIT + 1000 <= potential_credit_lines_max) THEN 1000
+  
+  
+WHEN PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 1000 AND RISKGROUP_DSERIES_Y1 = 1 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 AND (PRE_CLIP_LINE_LIMIT + 1000 <= potential_credit_lines_max) THEN 1000
 WHEN PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 1000 AND RISKGROUP_DSERIES_Y1 = 1 AND average_utilization_3_months_FLOAT >= 0.1 AND average_utilization_3_months_FLOAT < 0.3 AND ab_testing_random_number_FLOAT >= 0.02 AND ab_testing_random_number_FLOAT < 0.52 AND (PRE_CLIP_LINE_LIMIT + 1000 <= potential_credit_lines_max) THEN 1000
 WHEN PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 1000 AND RISKGROUP_DSERIES_Y1 = 1 AND average_utilization_3_months_FLOAT >= 0.3 AND average_utilization_3_months_FLOAT < 0.5 AND ab_testing_random_number_FLOAT >= 0.02 AND ab_testing_random_number_FLOAT < 0.52 AND (PRE_CLIP_LINE_LIMIT + 1000 <= potential_credit_lines_max) THEN 1000
 WHEN PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 1000 AND RISKGROUP_DSERIES_Y1 = 1 AND average_utilization_3_months_FLOAT >= 0.5 AND average_utilization_3_months_FLOAT < 0.8 AND ab_testing_random_number_FLOAT >= 0.02 AND ab_testing_random_number_FLOAT < 0.52 AND (PRE_CLIP_LINE_LIMIT + 1000 <= potential_credit_lines_max) THEN 1000
