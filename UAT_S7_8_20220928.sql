@@ -281,6 +281,8 @@ SELECT  A.ACCOUNT_ID,
     
         CASE 
            when pass_eligibility = 0 then 0 
+	   WHEN statement_3_outcome_TEXT ilike '%approved%' and statement_3_test_group_TEXT ilike '%rollout%' and policy_assignment_random_number_FLOAT < 0.33 THEN 0
+  	   WHEN statement_3_outcome_TEXT ilike '%approved%' and statement_3_test_group_TEXT ilike '%test1%' and policy_assignment_random_number_FLOAT < 0.5 THEN 0
            when pass_eligibility = 1 and account_review_hardcuts = 0 then 100
            WHEN MAX_Y1_CLIP_AMOUNT = 0 THEN 0 
 
