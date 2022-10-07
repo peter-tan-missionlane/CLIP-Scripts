@@ -1,4 +1,3 @@
-
 -- ELIGIBILITY AND HARDCUT LOGIC; APPLIES "INITIAL" CLIP CALCULATION AMOUNT TO UAT RECORD
 CREATE OR REPLACE TEMPORARY TABLE CLIP_SIM_TABLE AS
 SELECT
@@ -75,7 +74,7 @@ SELECT
   ELSE 0
   END
   AS account_review_hardcuts
-  ,decision_data:"clip_model_c_20210811_risk_group"::INT AS clip_risk_group_INT
+  ,decision_data:"clip_model_d1_20220728_risk_group"::INT AS clip_risk_group_INT
   ,decision_data:"average_utilization_3_months"::FLOAT AS average_utilization_3_months_FLOAT
   ,decision_data:"ab_testing_random_number"::FLOAT AS ab_testing_random_number_FLOAT
   ,decision_data:"payment_vacation__passed" AS payment_vacation__passed
@@ -84,58 +83,15 @@ SELECT
   ,decision_data:"cicada_risk_group"::INT AS cicada_risk_group
   ,OUTCOME
   ,TEST_SEGMENT
-  ,decision_data:"delinquencies"::INT AS delinquencies_count
+  ,decision_data:"delinquencies"::INT AS delinquencies_count 
 ,CASE WHEN pass_eligibility = 0 OR account_review_hardcuts = 0 OR payment_vacation__passed = 'false' THEN 0
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 2 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 2 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 2 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 2 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 3 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 3 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 3 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 3 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 4 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 4 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 4 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 4 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 5 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 5 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 5 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 0
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 5 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 0
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 6 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 6 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 6 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 0
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 6 AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 0
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 1 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 2 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 2 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 2 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 2 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 3 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 3 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 3 AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 3 AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 4 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 4 AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 4 AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 4 AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 5 AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 5 AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 5 AND ab_testing_random_number_FLOAT >= 0.8 THEN 0
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 5 AND ab_testing_random_number_FLOAT >= 0.8 THEN 0
-WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 6 AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
-WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 6 AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
-WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 6 AND ab_testing_random_number_FLOAT >= 0.8 THEN 0
-WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 6 AND ab_testing_random_number_FLOAT >= 0.8 THEN 0
+WHEN cicada_risk_group in (1,2,3) AND clip_risk_group_INT in (1,2,3) AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 500
+WHEN cicada_risk_group in (1,2,3) AND clip_risk_group_INT in (4,5) AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
+WHEN cicada_risk_group in (4,5,6) AND clip_risk_group_INT in (1,2,3) AND ab_testing_random_number_FLOAT >= 0.2 AND ab_testing_random_number_FLOAT < 0.8 THEN 300
+
+WHEN cicada_risk_group in (1,2,3) AND clip_risk_group_INT in (1,2,3) AND ab_testing_random_number_FLOAT >= 0.8 THEN 1000
+WHEN cicada_risk_group in (1,2,3) AND clip_risk_group_INT in (4,5) AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
+WHEN cicada_risk_group in (4,5,6) AND clip_risk_group_INT in (1,2,3) AND ab_testing_random_number_FLOAT >= 0.8 THEN 500
 ELSE 0 END AS CLIP_AMOUNT_FIRST
   ,decision_data:"TEST_SEGMENT" AS COL13
   ,decision_data:"clip_risk_group" AS COL14
@@ -145,15 +101,18 @@ ELSE 0 END AS CLIP_AMOUNT_FIRST
 --  ,pass_eligibility
 --  ,account_review_hardcuts
 --  ,CLIP_AMOUNT
-FROM    edw_db.public.clip_results_data A
-WHERE   STATEMENT_NUMBER = 3
-        AND CLIP_POLICY_NAME = 'YEAR_1_STATEMENT3_20220601'
+//FROM    edw_db.public.clip_results_data A
+//WHERE   STATEMENT_NUMBER = 3
+from (select evaluated_timestamp_utc as evaluated_timestamp, * 
+      from SANDBOX_DB.USER_TB.CLIP_UAT_RESULTS_DATA where test_id = '52bc0167-4971-4660-89cb-7e2c61f78232' and statement_number = 3
+        AND CLIP_POLICY_NAME = 'YEAR_1_STATEMENT3_20221003'
         
 --  AND A.EVALUATED_TIMESTAMP > '2022-04-01'
-  AND (PRE_EVALUATION = FALSE OR PRE_EVALUATION IS NULL)
+  AND (PRE_EVALUATION = FALSE OR PRE_EVALUATION IS NULL)) A
 --  AND CLIP_POLICY_NAME = 'BAILEY_CONCLIP_20220307'
   --AND difference <> 0
 ;
+
 
 
 -- PRE-EXISTING CODE TO REFORMAT ATP SCORES
@@ -264,30 +223,9 @@ SELECT  A.ACCOUNT_ID,
             AS MAX_ATP_CLIP_AMOUNT,
         CASE WHEN CLIP_AMOUNT_FIRST <= MAX_ATP_CLIP_AMOUNT THEN CLIP_AMOUNT_FIRST
             WHEN AB_TESTING_RANDOM_NUMBER_FLOAT < 0.8 THEN 0
-            WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 1 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 1 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 1 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 1 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 2 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 2 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 2 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 2 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 3 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 3 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 3 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
-            WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 3 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
-            WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 4 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 4 AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
-            WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 4 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
-            WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 4 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
-            WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 5 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
-            WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 5 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
-            WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 5 AND (PRE_CLIP_LINE_LIMIT + 0 <= potential_credit_lines_max) THEN 0
-            WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 5 AND (PRE_CLIP_LINE_LIMIT + 0 <= potential_credit_lines_max) THEN 0
-            WHEN cicada_risk_group = 1 AND clip_risk_group_INT = 6 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
-            WHEN cicada_risk_group = 2 AND clip_risk_group_INT = 6 AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
-            WHEN cicada_risk_group = 3 AND clip_risk_group_INT = 6 AND (PRE_CLIP_LINE_LIMIT + 0 <= potential_credit_lines_max) THEN 0
-            WHEN cicada_risk_group = 4 AND clip_risk_group_INT = 6 AND (PRE_CLIP_LINE_LIMIT + 0 <= potential_credit_lines_max) THEN 0      
+            WHEN cicada_risk_group in (1,2,3) AND clip_risk_group_INT in (1,2,3) AND (PRE_CLIP_LINE_LIMIT + 500 <= potential_credit_lines_max) THEN 500
+            WHEN cicada_risk_group in (1,2,3) AND clip_risk_group_INT in (4,5) AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300
+            WHEN cicada_risk_group in (4,5,6) AND clip_risk_group_INT in (1,2,3) AND (PRE_CLIP_LINE_LIMIT + 300 <= potential_credit_lines_max) THEN 300    
             ELSE 0 END AS CLIP_AMOUNT_CREDIT,
             CLIP_AMOUNT - CLIP_AMOUNT_CREDIT AS DIFFERENCE
 
@@ -298,4 +236,4 @@ FROM    CL_THRESHOLD A
 --RETURNS RECORDS WHERE THERE IS A DIFFERENCE BETWEEN ENGINEERS CLIP ASSIGNMENT AND CREDITS CALCULATION
 SELECT  *
 FROM    CLIP_FINAL
-WHERE   DIFFERENCE <> 0
+WHERE   DIFFERENCE <> 0;
