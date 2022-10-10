@@ -270,12 +270,14 @@ SELECT  A.ACCOUNT_ID,
         delinquencies_count,
         PRE_CLIP_LINE_LIMIT,
         TEST_CLIP_AMOUNT,
+        potential_credit_lines_max,
         CASE WHEN ($max_y1_line - PRE_CLIP_LINE_LIMIT) > 0 THEN $max_y1_line - PRE_CLIP_LINE_LIMIT ELSE 0 END
-            AS MAX_ATP_CLIP_AMOUNT,
+            AS MAX_Y1_CLIP_AMOUNT,
 
         CASE 
-            WHEN MAX_ATP_CLIP_AMOUNT = 0 THEN 0  
+            WHEN MAX_Y1_CLIP_AMOUNT = 0 THEN 0  
             when account_review_hardcuts = 0 then 0
+            when second_chance_clip not ilike '%true%' and pass_eligibility = 0 then 0
             --2nd chance CLIP
             when second_chance_clip ilike '%true%' and PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DSERIES_Y1 between 1 and 2 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND ab_testing_random_number_FLOAT >= 0.1  THEN 500
             when second_chance_clip ilike '%true%' and PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DSERIES_Y1 between 3 and 4 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND ab_testing_random_number_FLOAT >= 0.1  THEN 300
@@ -1104,7 +1106,9 @@ WHEN PRE_CLIP_LINE_LIMIT > 3000 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DS
     
   ELSE 0 END AS D_series_CLIP_AMOUNT_no_max
     
-    , case when MAX_ATP_CLIP_AMOUNT < D_series_CLIP_AMOUNT_no_max then MAX_ATP_CLIP_AMOUNT else D_series_CLIP_AMOUNT_no_max end as D_series_CLIP_AMOUNT -- using smaller of max potential CLIP and BAU CLIP amount to make sure we don't go over the max Y1 line amount ($5k)
+    , case when MAX_Y1_CLIP_AMOUNT < D_series_CLIP_AMOUNT_no_max then MAX_Y1_CLIP_AMOUNT  ---ensure no CLIP results in line going above Y1 max line
+            when D_series_CLIP_AMOUNT_no_max > 0 and (potential_credit_lines_max - pre_clip_line_limit) < D_series_CLIP_AMOUNT_no_max then potential_credit_lines_max - pre_clip_line_limit     ---ensure no CLIP is higher than the max CLIP according to ATP
+            else D_series_CLIP_AMOUNT_no_max end as D_series_CLIP_AMOUNT -- using smaller of max potential CLIP and BAU CLIP amount to make sure we don't go over the max Y1 line amount ($5k)
 
 FROM    CL_THRESHOLD A
         LEFT JOIN Info_MAX_CL B ON A.ACCOUNT_ID = B.ACCOUNT_ID AND A.EVALUATED_TIMESTAMP_UTC = B.EVALUATED_TIMESTAMP_UTC
@@ -1136,7 +1140,7 @@ select account_id
     , D_SERIES_CLIP_AMOUNT 
     , TEST_CLIP_AMOUNT
     , case when D_SERIES_CLIP_AMOUNT > 0 then 1 else 0 end as D_CLIP_CNT
-    , MAX_ATP_CLIP_AMOUNT 
+    , MAX_Y1_CLIP_AMOUNT 
     , D_series_CLIP_AMOUNT_no_max
 FROM    CLIP_FINAL   
 -- where TEST_CLIP_AMOUNT > 0
