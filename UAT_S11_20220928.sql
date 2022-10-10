@@ -277,7 +277,7 @@ SELECT  A.ACCOUNT_ID,
         CASE 
             WHEN MAX_Y1_CLIP_AMOUNT = 0 THEN 0  
             when account_review_hardcuts = 0 then 0
-            when second_chance_clip not ilike '%true%' and pass_eligibility = 0 then 0
+            when (second_chance_clip is null or second_chance_clip not ilike '%true%') and pass_eligibility = 0 then 0
             --2nd chance CLIP
             when second_chance_clip ilike '%true%' and PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DSERIES_Y1 between 1 and 2 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND ab_testing_random_number_FLOAT >= 0.1  THEN 500
             when second_chance_clip ilike '%true%' and PRE_CLIP_LINE_LIMIT > 0 AND PRE_CLIP_LINE_LIMIT <= 5000 AND RISKGROUP_DSERIES_Y1 between 3 and 4 AND average_utilization_3_months_FLOAT > 0 AND average_utilization_3_months_FLOAT < 0.1 AND ab_testing_random_number_FLOAT >= 0.1  THEN 300
