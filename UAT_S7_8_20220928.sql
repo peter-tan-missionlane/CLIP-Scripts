@@ -1101,8 +1101,8 @@ WHEN pass_eligibility = 1 and account_review_hardcuts = 0 then 100
   ELSE NULL END AS D_series_CLIP_AMOUNT_no_max
    
     , case when MAX_Y1_CLIP_AMOUNT < D_series_CLIP_AMOUNT_no_max then MAX_Y1_CLIP_AMOUNT  ---ensure no CLIP results in line going above Y1 max line
-            when D_series_CLIP_AMOUNT_no_max > 0 and (potential_credit_lines_max - pre_clip_line_limit) < D_series_CLIP_AMOUNT_no_max then 100      ---ensure no CLIP is higher than the max CLIP according to ATP
-            else D_series_CLIP_AMOUNT_no_max end as D_series_CLIP_AMOUNT -- using smaller of max potential CLIP and BAU CLIP amount to make sure we don't go over the max Y1 line amount ($5k)
+            when D_series_CLIP_AMOUNT_no_max > 0 and (potential_credit_lines_max - pre_clip_line_limit) < D_series_CLIP_AMOUNT_no_max then potential_credit_lines_max - pre_clip_line_limit      ---ensure no CLIP is higher than the max CLIP according to ATP
+	    else D_series_CLIP_AMOUNT_no_max end as D_series_CLIP_AMOUNT -- using smaller of max potential CLIP and BAU CLIP amount to make sure we don't go over the max Y1 line amount ($5k)
 
 FROM    CL_THRESHOLD A
         LEFT JOIN Info_MAX_CL B ON A.ACCOUNT_ID = B.ACCOUNT_ID AND A.EVALUATED_TIMESTAMP_UTC = B.EVALUATED_TIMESTAMP_UTC
